@@ -13,6 +13,8 @@ namespace Veduta_IKM722a_Course_project
     public partial class Form1 : Form
     {
         private bool Mode; // Режим дозволу / заборони введення даних
+        private MajorWork MajorObject; // Створення об'єкта класу MajorWork
+
         public Form1()
         {
             InitializeComponent();
@@ -28,7 +30,12 @@ namespace Veduta_IKM722a_Course_project
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            About A = new About(); // створення форми About
+            A.tAbout.Start();
+            A.ShowDialog(); // відображення діалогового вікна About
             this.Mode = true;
+            MajorObject = new MajorWork();
+            
         }
 
         private void bStart_Click(object sender, EventArgs e)
@@ -41,6 +48,9 @@ namespace Veduta_IKM722a_Course_project
                 tbInput.Enabled = true;// Режим дозвол
                                        // введення
                 tbInput.Focus();
+                MajorObject.Write(tbInput.Text);// Запис даних у об'єкт
+                MajorObject.Task();// Обробка даних
+                label1.Text = MajorObject.Read();// Відображення результату
             }
             else
             {
