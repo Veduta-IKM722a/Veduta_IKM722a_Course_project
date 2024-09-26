@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
+
 namespace Veduta_IKM722a_Course_project
 {
     public partial class Form1 : Form
@@ -37,7 +38,7 @@ namespace Veduta_IKM722a_Course_project
             this.Mode = true;
             MajorObject = new MajorWork();
             MajorObject.SetTime();
-
+            MajorObject.Modify = false;// заборона запису
         }
 
         private void bStart_Click(object sender, EventArgs e)
@@ -108,10 +109,11 @@ namespace Veduta_IKM722a_Course_project
 
         private void зберегтиЯкToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (sfdSave.ShowDialog() == DialogResult.OK)// Виклик діалогового вікна збереження
-                                                        // файлу
+            if (sfdSave.ShowDialog() == DialogResult.OK) // Виклик діалогового вікна збереження
+                                                         // файлу
             {
-                MessageBox.Show(sfdSave.FileName);
+                MajorObject.WriteSaveFileName(sfdSave.FileName); // написання імені файлу
+                MajorObject.SaveToFile(); // метод збереження в файл }
             }
         }
 
@@ -129,25 +131,26 @@ namespace Veduta_IKM722a_Course_project
         {
             string[] disks = System.IO.Directory.GetLogicalDrives(); // Строковий масив з
                                                                      // логічніх дисків
-             string disk = "";
+            string disk = "";
             for (int i = 0; i < disks.Length; i++)
             {
                 try
                 {
                     System.IO.DriveInfo D = new System.IO.DriveInfo(disks[i]);
-                    disk += D.Name + "-" + (D.TotalSize/(1073741824)).ToString() + "-" + (D.TotalFreeSpace/(1073741824)).ToString()
+                    disk += D.Name + "-" + (D.TotalSize / (1073741824)).ToString() + "-" + (D.TotalFreeSpace / (1073741824)).ToString()
                     + (char)13;// змінній присвоюється ім’я диска, загальна кількість місця и вільне
                                // місце на диску
                 }
                 catch
                 {
                     disk += disks[i] + "- не готовий" + (char)13; // якщо пристрій не готовий,
-                                                                   // то виведення на екран ім’я пристрою і
-                                                                   // повідомлення «не готовий»
-}
-            }
+                                                                  // то виведення на екран ім’я пристрою і
+                                                                  // повідомлення «не готовий»
 
-            MessageBox.Show(disk, "Накопичувачі");
+                }
+
+                MessageBox.Show(disk, "Накопичувачі");
+            }
         }
     }
 }
