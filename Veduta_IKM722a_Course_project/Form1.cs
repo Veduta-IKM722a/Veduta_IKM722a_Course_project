@@ -45,23 +45,22 @@ namespace Veduta_IKM722a_Course_project
         {
             if (Mode)
             {
+                tbInput.Enabled = true;// Режим дозволу введення
+                tbInput.Focus();
                 tClock.Start();
                 bStart.Text = "Стоп"; // зміна тексту на кнопці на "Стоп"
                 this.Mode = false;
-                tbInput.Enabled = true;// Режим дозвол
-                                       // введення
-                tbInput.Focus();
-                MajorObject.Write(tbInput.Text);// Запис даних у об'єкт
-                MajorObject.Task();// Обробка даних
-                label1.Text = MajorObject.Read();// Відображення результату
                 пускToolStripMenuItem.Text = "Стоп";
             }
             else
             {
+                tbInput.Enabled = false;// Режим заборони введення
                 tClock.Stop();
                 bStart.Text = "Пуск";// зміна тексту на кнопці на "Пуск"
                 this.Mode = true;
-                tbInput.Enabled = false;// Режим заборони введення
+                MajorObject.Write(tbInput.Text);// Запис даних у об'єкт
+                MajorObject.Task();// Обробка даних
+                label1.Text = MajorObject.Read();//Відображення
                 пускToolStripMenuItem.Text = "Старт";
             }
         }
@@ -124,7 +123,10 @@ namespace Veduta_IKM722a_Course_project
                                                          // файлу
 
             {
-                MessageBox.Show(ofdOpen.FileName);
+               
+                MajorObject.WriteOpenFileName(ofdOpen.FileName); // відкриття
+                                                                 // файлу
+                MajorObject.ReadFromFile(dgwOpen); // читання даних з файлу
             }
         }
 
@@ -175,6 +177,11 @@ namespace Veduta_IKM722a_Course_project
                 if (MessageBox.Show("Дані не були збережені. Продовжити вихід?", "УВАГА",
                 MessageBoxButtons.YesNo) == DialogResult.No)
                     e.Cancel = true; // припинити закриття
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            MajorObject.Find(tbSearch.Text); //пошук
         }
     }
 }

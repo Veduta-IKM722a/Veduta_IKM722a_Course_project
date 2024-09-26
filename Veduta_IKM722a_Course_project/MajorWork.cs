@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
+using System.Data;
 
 namespace Veduta_IKM722a_Course_project
 {
@@ -69,28 +70,27 @@ namespace Veduta_IKM722a_Course_project
                 return;
             try
             {
-                Stream S; // створення потоку
-                if (File.Exists(this.SaveFileName))// існує файл?
-                    S = File.Open(this.SaveFileName, FileMode.Append);// Відкриття файлу для збереження
+                Stream S;
+                if (File.Exists(this.SaveFileName))
+                    S = File.Open(this.SaveFileName, FileMode.Append);
                 else
-                    S = File.Open(this.SaveFileName, FileMode.Create);// створити файл
-                Buffer D = new Buffer(); // створення буферної змінної
+                    S = File.Open(this.SaveFileName, FileMode.Create);
+                Buffer D = new Buffer();
                 D.Data = this.Data;
                 D.Result = Convert.ToString(this.Result);
                 D.Key = Key;
                 Key++;
-                BinaryFormatter BF = new BinaryFormatter(); // створення об'єкта для
-                                                            // форматування BF.Serialize(S, D);
-                S.Flush(); // очищення буфера потоку
-                S.Close(); // закриття потоку
-                this.Modify = false; // Заборона повторного запису
+                BinaryFormatter BF = new BinaryFormatter();
+                BF.Serialize(S, D);
+                S.Flush();
+                S.Close();
+                this.Modify = false;
             }
             catch
             {
 
-                MessageBox.Show("Помилка роботи з файлом"); // Виведення на екран повідомлення "Помилка
-                                                            // роботи з файлом"
-            }
+                MessageBox.Show("Помилка роботи з файлом");
+            }                                           // "Помилка роботи з файлом
         }
 
         public void ReadFromFile(System.Windows.Forms.DataGridView DG) // зчитування з файлу
@@ -99,29 +99,40 @@ namespace Veduta_IKM722a_Course_project
             {
                 if (!File.Exists(this.OpenFileName))
                 {
-                    MessageBox.Show("Файлу немає"); // Виведення на екран повідомлення "файлу немає"
+                    MessageBox.Show("Файлу немає");
                     return;
                 }
-                Stream S; // створення потоку
-                S = File.Open(this.OpenFileName, FileMode.Open); // зчитування даних з
-                                                                 // файлу
-                                                                 //
+                Stream S;
+                S = File.Open(this.OpenFileName, FileMode.Open);
                 Buffer D;
-                object O; // буферна змінна для контролю формату
-                BinaryFormatter BF = new BinaryFormatter(); // створення об'єкту для форматування
+                object O;
+                BinaryFormatter BF = new BinaryFormatter();
+                DataTable MT = new DataTable();
+                DataColumn cKey = new DataColumn("Ключ");
+                DataColumn cInput = new DataColumn("Вхідні дані");
+                DataColumn cResult = new DataColumn("Результат");
+                MT.Columns.Add(cKey);
+                MT.Columns.Add(cInput);
+                MT.Columns.Add(cResult);
 
                 while (S.Position < S.Length)
                 {
-                    O = BF.Deserialize(S); // десеріалізація
+                    O = BF.Deserialize(S);
                     D = O as Buffer;
                     if (D == null) break;
-                    // Виведення даних на екран
+                    DataRow MR;
+                    MR = MT.NewRow();
+                    MR["Ключ"] = D.Key;
+                    MR["Вхідні дані"] = D.Data;
+                    MR["Результат"] = D.Result;
+                    MT.Rows.Add(MR);
                 }
-                S.Close(); // закриття
+                DG.DataSource = MT;
+                S.Close();
             }
             catch
             {
-                MessageBox.Show("Помилка файлу"); // Виведення на екран повідомлення "Помилка файлу"
+                MessageBox.Show("Помилка файлу");
             }
         } // ReadFromFile закінчився
 
@@ -167,5 +178,59 @@ namespace Veduta_IKM722a_Course_project
             this.Data = ""; // "" - ознака порожнього рядка
             this.Result = null; // для string- null
         }
+
+        public void Find(string Num) // пошук
+        {
+            int N;
+            try
+            {
+                N = Convert.ToInt16(Num); // перетворення номера рядка в int16 для  відображення
+            }
+            catch
+            {
+                MessageBox.Show("помилка пошукового запиту"); // Виведення на екран повідомлення "помилка пошукового запиту"          
+                return;
+            }
+            try
+            {
+                if (!File.Exists(this.OpenFileName))
+                {
+                    MessageBox.Show("файлу немає"); // Виведення на екран повідомлення                                
+                    return;
+                }
+                Stream S; // створення потоку
+                S = File.Open(this.OpenFileName, FileMode.Open); // відкриття файлу
+                Buffer D;
+                object O; // буферна змінна для контролю формату
+                BinaryFormatter BF = new BinaryFormatter(); // створення об'єкта для  форматування
+
+                while (S.Position < S.Length)
+                {
+                    O = BF.Deserialize(S);
+                    D = O as Buffer;
+                    if (D == null) break;
+                    if (D.Key == N) // перевірка дорівнює чи номер пошуку номеру рядка в                     таблиці
+
+                    {
+                        string ST;
+                        ST = "Запис містить:" + (char)13 + "No" + Num + "Вхідні дані:" +
+
+                        D.Data + "Результат:" + D.Result;
+
+                        MessageBox.Show(ST, "Запис знайдена"); // Виведення на екран        повідомлення "запис містить", номер, вхідних даних і результат
+
+                        S.Close();
+                        return;
+                    }
+                }
+                S.Close();
+                MessageBox.Show("Запис не знайдена"); // Виведення на екран повідомлення "Запис не знайдена"
+            }
+            catch
+            {
+
+                MessageBox.Show("Помилка файлу"); // Виведення на екран повідомлення  "Помилка файлу"
+            }
+        }  // Find закінчився
     }
 }
