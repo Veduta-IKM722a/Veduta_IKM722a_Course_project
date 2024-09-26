@@ -12,6 +12,8 @@ namespace Veduta_IKM722a_Course_project
         private string Result; // Поле результату
         private bool Mode; // Режим дозволу-заборони введення даних
         private System.DateTime TimeBegin; // час початку роботи програми
+        private string SaveFileName;// ім’я файлу для запису
+        private string OpenFileName;// ім’я файлу для читання
 
         public void Write(string D)
         {
@@ -44,6 +46,15 @@ namespace Veduta_IKM722a_Course_project
         public System.DateTime GetTime() // Метод отримання часу завершення програми
         {
             return this.TimeBegin;
+        }
+
+        public void WriteSaveFileName(string S)// метод запису даних в об'єкт
+        {
+            this.SaveFileName = S;// запам'ятати ім’я файлу для запису
+        }
+        public void WriteOpenFileName(string S)
+        {
+            this.OpenFileName = S;// запам'ятати ім’я файлу для відкриття
         }
 
     }
